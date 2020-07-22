@@ -1,0 +1,75 @@
+ROUTINE ECPjob
+ECPjob  ;;; Init and execute remote ECP Job Start over ECP  
+        ;;; This has to be available also in your remote namespace
+     quit
+#Define eSPACE "USER"
+#Define ePARAM ^|$$$eSPACE|ECP.job
+#Define sPARAM ^ECP.job
+#Define OK 1
+#;
+#; Initialize responder over ECP
+#; requires  Namespace that is fully remote over ECP
+#;
+init(&param) Public {
+    JOB server^ECP.job|$$$eSPACE| set zc=$zc
+    if 'zc Write "Job start failed",!  quit $TEST
+    quit $$loadparams(zc,.param)
+}
+#; as we can't pass parameters with the JOB command we need
+#; a differnt way of parameter passing
+#; load parameters for remote server into a ECP based Global
+#;
+#; I: zc = remote $JOB
+#;    param => array of params to be passed
+#;    param = numberof subscripts
+#;    param(1) = first parameter
+#;    .....
+#;
+loadparams(zc,&param) Public { 
+    set $$$ePARAM(zc)=0                     ; params not ready yet
+    set $$$ePARAM(zc,0)=$zdt($now(),3)      ; start time
+    merge $$$ePARAM(zc,1)=param             ; move to remote params
+    kill $$$ePARAM(zc,2)                    ; clean return section
+    if $increment($$$ePARAM(zc))            ; force ECP sync and rellease remote job
+#; wait for reply
+wait 
+    while $$$ePARAM(zc)<2 { hang 1.1 }      ;
+#;  zwrite $$$ePARAM(zc,2)                  ; show reply only
+    zwrite $$$ePARAM                        ; show all
+   
+    kill $$$ePARAM(zc)                      ; clean out for next time
+    quit $$$OK
+}
+#;
+#; remote ECP Job
+#;
+server 
+    set zc=$job
+#; wait for params
+    while $g($$$sPARAM(zc),0)=0 { hang .5}              
+#; load passed params
+    merge param= $$$sPARAM(zc,1)
+    quit $$processing(zc,.param) 
+
+#; simulate some processing 
+processing(zc,&param) Public {
+    set reply=""   
+    for i=1:1:param {
+        set $li(reply,i)=param(i) 
+        hang .2
+        }
+ #; prepare response
+    set $$$sPARAM(zc,2)=3
+        ,$$$sPARAM(zc,2,1)=reply
+        ,$$$sPARAM(zc,2,2)=$zdt($now(),3)
+        ,$$$sPARAM(zc,2,3)="***** done *****"
+    if $increment($$$sPARAM(zc))            ; force ECP sync and signal completion
+    quit $$$OK
+}
+
+#;; create some test parameters        
+test 
+    kill param
+    for param=1:1:5 set param(param)="param "_param
+    do init(.param)
+    quit 
