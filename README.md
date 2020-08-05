@@ -23,7 +23,7 @@ also from one namespace to the other. Eg. From SAMPLES to USER or reverse.
 ECP is just a data management feature and not an operational requirement.
  
 Just place the routine in the 2 namespaces you want to connect.
-Edit namespace parameers and run test^ECP.job to see it moving.
+Edit namespace parameers and run test^ECP.job to see it moving. 
 ~~~
   SAMPLES>d test^ECP.job  
   ^|"USER"|ECP.job(12268)=2  
