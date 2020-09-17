@@ -43,4 +43,4 @@ Edit namespace parameers and run test^ECP.job to see it moving.
 For ease of use both the client and the server code are homed together.  
 Not a requirement, just for comfort.
 
-[Article in DC](https://community.intersystems.com/post/zpmshow-helper-tired-fingers)
+[Article in DC](https://community.intersystems.com/post/background-jobs-over-ecp)
