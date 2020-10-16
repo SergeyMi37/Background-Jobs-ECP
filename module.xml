@@ -3,8 +3,8 @@
   <Document name="ecp-job.ZPM">
     <Module>
       <Name>ecp-job</Name>
-      <Version>1.0.1</Version>
-      <Description>Multi-Line in Terminal Command</Description>
+      <Version>1.0.2</Version>
+      <Description>start background job on connected ECP server</Description>
       <Keywords>ECP, COS</Keywords>
       <Packaging>module</Packaging>
       <SourcesRoot>src</SourcesRoot>
